@@ -1,3 +1,5 @@
+[![NuGet](https://img.shields.io/nuget/v/Serilog.Sinks.LogtailSys.svg)](https://www.nuget.org/packages/Serilog.Sinks.LogtailSys)
+
 A [Serilog](https://serilog.net) sink that logs events to logtail.
 
 ### Getting started
