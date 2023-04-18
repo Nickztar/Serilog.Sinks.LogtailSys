@@ -4,7 +4,7 @@ A [Serilog](https://serilog.net) sink that logs events to logtail.
 
 ### Getting started
 
-Install the [Serilog.Sinks.LogtailSys](https://www.nuget.org/packages/Serilog.Sinks.Logtail) package from NuGet:
+Install the [Serilog.Sinks.LogtailSys](https://www.nuget.org/packages/Serilog.Sinks.LogtailSys) package from NuGet:
 
 Using Package Manager
 In Visual Studio, open **NuGet Package Manager Console** by clicking **Tools** → **NuGet Package Manager** → **Package Manager Console**
