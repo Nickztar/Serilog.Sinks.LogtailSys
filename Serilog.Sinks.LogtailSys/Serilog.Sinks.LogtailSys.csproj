@@ -14,7 +14,9 @@
     <PackageId>Serilog.Sinks.LogtailSys</PackageId>
     <PackageTags>serilog;syslog;logging;logtail</PackageTags>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageProjectUrl>https://github.com/nickztar/serilog-sinks-logtailsys</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Nickztar/Serilog.Sinks.LogtailSys</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenceUrl>https://github.com/Nickztar/Serilog.Sinks.LogtailSys/blob/master/LICENCE</PackageLicenceUrl>
     <RepositoryType>git</RepositoryType>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <IsPackable>true</IsPackable>
@@ -28,6 +30,7 @@
 
   <ItemGroup>
     <None Include="icon.png" Pack="true" PackagePath="" />
+    <None Include="../README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
