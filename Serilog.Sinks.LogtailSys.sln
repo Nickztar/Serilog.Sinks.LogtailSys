@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33530.505
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serilog.Sinks.LogtailSys", "Serilog.Sinks.LogtailSys\Serilog.Sinks.LogtailSys.csproj", "{213CADBF-B76A-4D6A-B670-4E65357A8808}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serilog.Sinks.LogtailSys.Example", "Serilog.Sinks.LogtailSys.Example\Serilog.Sinks.LogtailSys.Example.csproj", "{E01C60E8-9A08-4085-9F76-5068E98CA229}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{213CADBF-B76A-4D6A-B670-4E65357A8808}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{213CADBF-B76A-4D6A-B670-4E65357A8808}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{213CADBF-B76A-4D6A-B670-4E65357A8808}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{213CADBF-B76A-4D6A-B670-4E65357A8808}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E01C60E8-9A08-4085-9F76-5068E98CA229}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E01C60E8-9A08-4085-9F76-5068E98CA229}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E01C60E8-9A08-4085-9F76-5068E98CA229}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E01C60E8-9A08-4085-9F76-5068E98CA229}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4740BAA7-BF6C-41BA-9FF3-718C338F5AB4}
+	EndGlobalSection
+EndGlobal
