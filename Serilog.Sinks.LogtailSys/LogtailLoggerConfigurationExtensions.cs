@@ -107,7 +107,7 @@ namespace Serilog
             {
                 templateFormatter = string.IsNullOrWhiteSpace(outputTemplate)
                     ? null
-                    : new MessageTemplateTextFormatter(outputTemplate);
+                    : new MessageTemplateTextFormatter(outputTemplate!);
             }
             else
             {

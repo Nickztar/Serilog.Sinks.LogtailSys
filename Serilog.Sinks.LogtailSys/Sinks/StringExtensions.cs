@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Serilog.Sinks.Logtail
@@ -18,10 +19,15 @@ namespace Serilog.Sinks.Logtail
         {
             if (string.IsNullOrEmpty(source))
                 return source;
-
+            #if NETSTANDARD2_0
+            return source.Length > maxLength
+                ? source.Substring(0, maxLength).TrimEnd()
+                : source;
+            #else
             return source.Length > maxLength
                 ? source[..maxLength].TrimEnd()
                 : source;
+            #endif
         }
 
         public static string AsPrintableAscii(this string source)

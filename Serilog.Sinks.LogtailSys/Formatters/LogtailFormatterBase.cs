@@ -43,7 +43,7 @@ namespace Serilog.Sinks.Logtail
             // Use source hostname override, if specified
             Host = string.IsNullOrEmpty(sourceHost)
                 ? Environment.MachineName.WithMaxLength(255)
-                : sourceHost.WithMaxLength(255);
+                : sourceHost!.WithMaxLength(255);
         }
 
         public abstract string FormatMessage(LogEvent logEvent);
