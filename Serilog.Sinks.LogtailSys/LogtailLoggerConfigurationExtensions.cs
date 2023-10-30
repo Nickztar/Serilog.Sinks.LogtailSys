@@ -31,6 +31,7 @@ namespace Serilog
         /// <param name="tokenKey">The key of Logtail token, leave empty if not overriding</param>
         /// <param name="token">Your source token from (rsyslog) logtail</param>
         /// <param name="port">Port the syslog server is listening on</param>
+        /// <param name="dataName">A name for the structured data, defaults to "Parameters"</param>
         /// <param name="appName">The name of the application. Must be all printable ASCII characters. Max length 32. Defaults to the current process name</param>
         /// <param name="facility"><inheritdoc cref="Facility" path="/summary"/> Defaults to <see cref="Facility.Local0"/>.</param>
         /// <param name="batchConfig">Batching configuration</param>
@@ -45,8 +46,9 @@ namespace Serilog
             this LoggerSinkConfiguration loggerSinkConfig,
             string token,
             string tokenKey = "logtail@11993 source_token",
-            string host = "in.logtail.com", 
+            string host = "in.logs.betterstack.com", 
             int port = 6517, 
+            string dataName = "Parameters", 
             string? appName = null,
             Facility facility = Facility.Local0, 
             PeriodicBatchingSinkOptions? batchConfig = null, 
@@ -61,7 +63,7 @@ namespace Serilog
                 throw new ArgumentException(nameof(host));
 
             batchConfig ??= DefaultBatchOptions;
-            var messageFormatter = GetFormatter(tokenKey, token, appName, facility, outputTemplate, messageIdPropertyName, sourceHost, severityMapping, formatter);
+            var messageFormatter = GetFormatter(tokenKey, token, dataName, appName, facility, outputTemplate, messageIdPropertyName, sourceHost, severityMapping, formatter);
             var endpoint = ResolveIP(host, port);
 
             var logtailSink = new LogtailSink(endpoint, messageFormatter);
@@ -93,6 +95,7 @@ namespace Serilog
         private static ILogtailFormatter GetFormatter(
             string tokenKey,
             string token,
+            string dataName,
             string? appName, 
             Facility facility,
             string? outputTemplate,
@@ -117,6 +120,7 @@ namespace Serilog
             return new LogtailFormatter(
                 tokenKey,
                 token,
+                dataName,
                 facility,
                 appName,
                 templateFormatter,

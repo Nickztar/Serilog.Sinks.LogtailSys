@@ -8,6 +8,7 @@ var logConfig = new LoggerConfiguration()
     .WriteTo.Console();
 const string outputTemplate = "UDP: {Message}";
 var log = logConfig
+    .MinimumLevel.Debug()
     .WriteTo.Logtail(
         token: "$SOURCE_TOKEN",
         appName: "ExampleLogtailProject",
@@ -18,4 +19,7 @@ var log = logConfig
     
 SelfLog.Enable(Console.Error);
 
-log.Information("Hello, World!");
+var name = "logtail";
+log.Information("Hello World! {Name}", name);
+//Not required.
+await log.DisposeAsync();

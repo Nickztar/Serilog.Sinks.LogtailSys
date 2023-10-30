@@ -25,6 +25,7 @@ namespace Serilog.Sinks.Logtail
         private readonly string messageIdPropertyName;
         private readonly string tokenKey;
         private readonly string token;
+        private readonly string dataName;
 
         internal const string DefaultMessageIdPropertyName = "SourceContext";
 
@@ -40,9 +41,11 @@ namespace Serilog.Sinks.Logtail
         /// <param name="severityMapping"><inheritdoc cref="LogtailFormatterBase" path="/param[@name='severityMapping']"/></param>
         /// <param name="tokenKey">The key of Logtail token, something like logtail@11111 source_token</param>
         /// <param name="token">Your source token from rsys logtail</param>
+        /// <param name="dataName">A name for the structured data, defaults to "Parameters"</param>
         public LogtailFormatter(
             string tokenKey,
             string token,
+            string dataName,
             Facility facility = Facility.Local0, 
             string? applicationName = null,
             ITextFormatter? templateFormatter = null,
@@ -65,6 +68,7 @@ namespace Serilog.Sinks.Logtail
 
              this.tokenKey = tokenKey;
              this.token = token;
+             this.dataName = dataName;
         }
 
         public override string FormatMessage(LogEvent logEvent)
@@ -111,7 +115,7 @@ namespace Serilog.Sinks.Logtail
                 new KeyValuePair<string, string>(RenderPropertyKey(kvp.Key), RenderPropertyValue(kvp.Value)));
             var tokenPart = $"{tokenKey}=\"{token}\"";
             var structuredDataKvps = string.Join(" ", properties.Select(t => $@"{t.Key}=""{t.Value}"""));
-            var structuredData = string.IsNullOrEmpty(structuredDataKvps) ? $"[{tokenPart}]" : $"[{tokenPart} {structuredDataKvps}]";
+            var structuredData = string.IsNullOrEmpty(structuredDataKvps) ? $"[{tokenPart}]" : $"[{tokenPart}][{dataName} {structuredDataKvps}]";
 
             return structuredData;
         }
