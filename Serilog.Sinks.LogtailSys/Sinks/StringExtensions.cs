@@ -4,9 +4,11 @@ using System.Text.RegularExpressions;
 
 namespace Serilog.Sinks.Logtail
 {
-    public static class StringExtensions
+    public static partial class StringExtensions
     {
-        private static readonly Regex printableAsciiRegex = new("[^\\u0021-\\u007E]", RegexOptions.Compiled | RegexOptions.Singleline);
+#if !NET7_0
+        private static readonly Regex printableAsciiRegex = new(@"[^\u0021-\u007E]", RegexOptions.Compiled | RegexOptions.Singleline);
+#endif
 
         /// <summary>
         /// Truncates a string so that it is no longer than the specified number of characters.
@@ -34,8 +36,11 @@ namespace Serilog.Sinks.Logtail
         {
             if (string.IsNullOrEmpty(source))
                 return source;
-
+#if NET7_0
+            return PrintableAsciiRx().Replace(source, string.Empty);
+#else
             return printableAsciiRegex.Replace(source, string.Empty);
+#endif
         }
 
         /// <summary>
@@ -55,5 +60,10 @@ namespace Serilog.Sinks.Logtail
 
         public static int ToInt(this string source)
             => Convert.ToInt32(source);
+
+#if NET7_0
+        [GeneratedRegex(@"[^\u0021-\u007E]", RegexOptions.Compiled | RegexOptions.Singleline)]
+        private static partial Regex PrintableAsciiRx();
+#endif
     }
 }

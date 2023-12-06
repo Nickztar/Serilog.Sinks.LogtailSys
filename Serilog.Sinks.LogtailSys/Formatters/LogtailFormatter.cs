@@ -12,7 +12,7 @@ namespace Serilog.Sinks.Logtail
     /// Formats messages that comply with syslog RFC5424 & Logtail
     /// https://tools.ietf.org/html/rfc5424
     /// </summary>
-    public class LogtailFormatter : LogtailFormatterBase
+    public partial class LogtailFormatter : LogtailFormatterBase
     {
         /// <summary>
         /// Used in place of data that cannot be obtained or is unavailable
@@ -104,7 +104,7 @@ namespace Serilog.Sinks.Logtail
                 .AsPrintableAscii()
                 .WithMaxLength(32);
 
-            return result != null && result.Length >= 1
+            return result is { Length: >= 1 }
                 ? result
                 : NILVALUE;
         }
@@ -114,7 +114,9 @@ namespace Serilog.Sinks.Logtail
             var properties = logEvent.Properties.Select(kvp =>
                 new KeyValuePair<string, string>(RenderPropertyKey(kvp.Key), RenderPropertyValue(kvp.Value)));
             var tokenPart = $"{tokenKey}=\"{token}\"";
-            var structuredDataKvps = string.Join(" ", properties.Select(t => $@"{t.Key}=""{t.Value}"""));
+            var structuredDataKvps = string.Join(" ", properties.Select(t => $"""
+                                                                              {t.Key}="{t.Value}"
+                                                                              """));
             var structuredData = string.IsNullOrEmpty(structuredDataKvps) ? $"[{tokenPart}]" : $"[{tokenPart}][{dataName} {structuredDataKvps}]";
 
             return structuredData;
@@ -127,7 +129,12 @@ namespace Serilog.Sinks.Logtail
 
             // Also remove any '=', ']', and '"", as these are also not permitted in structured data parameter names
             // Unescaped regex pattern: [=\"\]]
+            
+#if NET7_0
+            result = PropertyKeyRx().Replace(result, string.Empty);
+#else
             result = Regex.Replace(result, "[=\\\"\\]]", string.Empty);
+#endif
 
             return result.WithMaxLength(32);
         }
@@ -145,7 +152,18 @@ namespace Serilog.Sinks.Logtail
                 .TrimAndUnescapeQuotes();
 
             // Use a backslash to escape backslashes, double quotes and closing square brackets
+#if NET7_0
+            return PropertyValueRx().Replace(result, match => $@"\{match}");
+#else
             return Regex.Replace(result, @"[\]\\""]", match => $@"\{match}");
+#endif
         }
+        
+#if NET7_0
+        [GeneratedRegex("[\\]\\\\\"]")]
+        private static partial Regex PropertyValueRx();
+        [GeneratedRegex("[=\\\"\\]]")]
+        private static partial Regex PropertyKeyRx();
+#endif
     }
 }
