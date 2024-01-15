@@ -5,7 +5,7 @@
     <Description>Fully-featured Serilog sink that logs events to logtail using UDP (rSyslog).</Description>
     <Authors>Nicholas Brostrom (Nickztar)</Authors>
     <Company>Effectsoft AB</Company>
-    <VersionPrefix>1.0.4</VersionPrefix>
+    <VersionPrefix>1.0.5</VersionPrefix>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

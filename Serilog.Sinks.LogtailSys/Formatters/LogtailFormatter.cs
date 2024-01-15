@@ -111,12 +111,10 @@ namespace Serilog.Sinks.Logtail
 
         private string RenderStructuredData(LogEvent logEvent)
         {
-            var properties = logEvent.Properties.Select(kvp =>
-                new KeyValuePair<string, string>(RenderPropertyKey(kvp.Key), RenderPropertyValue(kvp.Value)));
             var tokenPart = $"{tokenKey}=\"{token}\"";
-            var structuredDataKvps = string.Join(" ", properties.Select(t => $"""
-                                                                              {t.Key}="{t.Value}"
-                                                                              """));
+            var structuredDataKvps = string.Join(" ", logEvent.Properties.Select(t => $"""
+                {RenderPropertyKey(t.Key)}="{RenderPropertyValue(t.Value)}"
+                """));
             var structuredData = string.IsNullOrEmpty(structuredDataKvps) ? $"[{tokenPart}]" : $"[{tokenPart}][{dataName} {structuredDataKvps}]";
 
             return structuredData;
