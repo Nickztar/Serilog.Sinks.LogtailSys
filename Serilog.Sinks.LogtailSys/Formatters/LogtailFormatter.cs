@@ -113,21 +113,24 @@ namespace Serilog.Sinks.Logtail
 
         private string RenderStructuredData(LogEvent logEvent)
         {
-            var builder = new StringBuilder();
-            builder.Append($"{tokenKey}=\"{token}\"");
-            if (logEvent.Properties.Count is 0) 
-                return builder.ToString();
-                
-            builder.Append($"[{dataName} ");
-            foreach (var property in logEvent.Properties)
-            {
-                var kvp = $"""
-                {RenderPropertyKey(property.Key)}="{RenderPropertyValue(property.Value)}"
-                """;
-                builder.Append(kvp);
-            }
-            builder.Append(']');
-            return builder.ToString();
+             var builder = new StringBuilder();
+             builder.Append($"[{tokenKey}=\"{token}\"]");
+             if (logEvent.Properties.Count is 0) 
+                 return builder.ToString();
+                 
+             builder.Append($"[{dataName} ");
+             var propertyLen = logEvent.Properties.Count;
+             foreach (var (i, property) in logEvent.Properties.Enumerate())
+             {
+                 var kvp = $"""
+                 {RenderPropertyKey(property.Key)}="{RenderPropertyValue(property.Value)}"
+                 """;
+                 builder.Append(kvp);
+                 if (i != propertyLen - 1)
+                     builder.Append(' ');
+             }
+             builder.Append(']');
+             return builder.ToString();
         }
 
         private static string RenderPropertyKey(string propertyKey)

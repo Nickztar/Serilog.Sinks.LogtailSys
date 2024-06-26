@@ -25,4 +25,10 @@
       <ProjectReference Include="..\Serilog.Sinks.LogtailSys\Serilog.Sinks.LogtailSys.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="LogtailRegex.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
