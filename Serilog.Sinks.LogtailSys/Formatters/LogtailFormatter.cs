@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Serilog.Events;
 using Serilog.Formatting;
@@ -57,14 +58,16 @@ namespace Serilog.Sinks.Logtail
             this.applicationName = applicationName ?? ProcessName;
 
             // Conform to the RFC
-            this.applicationName = this.applicationName
-                .AsPrintableAscii()
-                .WithMaxLength(48);
+            this.applicationName = new StringCleaner(this.applicationName)
+                .WithAsciiPrintable()
+                .WithMaxLength(48)
+                .Build();
 
             // Conform to the RFC
-            this.messageIdPropertyName = (messageIdPropertyName ?? DefaultMessageIdPropertyName)
-                .AsPrintableAscii()
-                .WithMaxLength(32);
+            this.messageIdPropertyName = new StringCleaner(messageIdPropertyName ?? DefaultMessageIdPropertyName)
+                .WithAsciiPrintable()
+                .WithMaxLength(32)
+                .Build();
 
              this.tokenKey = tokenKey;
              this.token = token;
@@ -92,18 +95,17 @@ namespace Serilog.Sinks.Logtail
         {
             var hasMsgId = logEvent.Properties.TryGetValue(messageIdPropertyName, out var propertyValue);
 
-            if (!hasMsgId)
+            if (!hasMsgId || propertyValue == null)
                 return NILVALUE;
 
-            var result = propertyValue?
-                .ToString()
-                .TrimAndUnescapeQuotes();
+            var result = new StringCleaner(propertyValue.ToString())
+                .WithTrimed('"')
+                .WithUnescapeQuotes()
+                .WithAsciiPrintable()
+                .WithMaxLength(32)
+                .Build();
 
             // Conform to the RFC's restrictions
-            result = result?
-                .AsPrintableAscii()
-                .WithMaxLength(32);
-
             return result is { Length: >= 1 }
                 ? result
                 : NILVALUE;
@@ -111,30 +113,33 @@ namespace Serilog.Sinks.Logtail
 
         private string RenderStructuredData(LogEvent logEvent)
         {
-            var tokenPart = $"{tokenKey}=\"{token}\"";
-            var structuredDataKvps = string.Join(" ", logEvent.Properties.Select(t => $"""
-                {RenderPropertyKey(t.Key)}="{RenderPropertyValue(t.Value)}"
-                """));
-            var structuredData = string.IsNullOrEmpty(structuredDataKvps) ? $"[{tokenPart}]" : $"[{tokenPart}][{dataName} {structuredDataKvps}]";
-
-            return structuredData;
+            var builder = new StringBuilder();
+            builder.Append($"{tokenKey}=\"{token}\"");
+            if (logEvent.Properties.Count is 0) 
+                return builder.ToString();
+                
+            builder.Append($"[{dataName} ");
+            foreach (var property in logEvent.Properties)
+            {
+                var kvp = $"""
+                {RenderPropertyKey(property.Key)}="{RenderPropertyValue(property.Value)}"
+                """;
+                builder.Append(kvp);
+            }
+            builder.Append(']');
+            return builder.ToString();
         }
 
         private static string RenderPropertyKey(string propertyKey)
         {
             // Conform to the RFC's restrictions
-            var result = propertyKey.AsPrintableAscii();
-
             // Also remove any '=', ']', and '"", as these are also not permitted in structured data parameter names
             // Unescaped regex pattern: [=\"\]]
-            
-#if NET7_0
-            result = PropertyKeyRx().Replace(result, string.Empty);
-#else
-            result = Regex.Replace(result, "[=\\\"\\]]", string.Empty);
-#endif
-
-            return result.WithMaxLength(32);
+            return new StringCleaner(propertyKey)
+                .WithAsciiPrintable()
+                .WithEscapedChars('=', '"', ']')
+                .WithMaxLength(32)
+                .Build();
         }
 
         /// <summary>
@@ -145,23 +150,15 @@ namespace Serilog.Sinks.Logtail
         private static string RenderPropertyValue(LogEventPropertyValue propertyValue)
         {
             // Trim surrounding quotes, and unescape all others
-            var result = propertyValue
-                .ToString()
-                .TrimAndUnescapeQuotes();
-
             // Use a backslash to escape backslashes, double quotes and closing square brackets
-#if NET7_0
-            return PropertyValueRx().Replace(result, match => $@"\{match}");
-#else
-            return Regex.Replace(result, @"[\]\\""]", match => $@"\{match}");
-#endif
+            return new StringCleaner(propertyValue
+                .ToString())
+                .WithTrimed('"')
+                .WithUnescapeQuotes()
+                .WithEscapedChars('"', '\\', ']')
+                .Build();
+
         }
         
-#if NET7_0
-        [GeneratedRegex("[\\]\\\\\"]")]
-        private static partial Regex PropertyValueRx();
-        [GeneratedRegex("[=\\\"\\]]")]
-        private static partial Regex PropertyKeyRx();
-#endif
     }
 }

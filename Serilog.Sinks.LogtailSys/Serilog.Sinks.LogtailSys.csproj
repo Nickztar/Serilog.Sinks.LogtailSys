@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard2.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;net8.0</TargetFrameworks>
     <Description>Fully-featured Serilog sink that logs events to logtail using UDP (rSyslog).</Description>
     <Authors>Nicholas Brostrom (Nickztar)</Authors>
     <Company>Effectsoft AB</Company>
@@ -23,8 +23,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Serilog" Version="3.1.1" />
-    <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="3.1.0" />
+    <PackageReference Include="Serilog" Version="4.0.0" />
+    <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="4.1.1" />
   </ItemGroup>
 
 
