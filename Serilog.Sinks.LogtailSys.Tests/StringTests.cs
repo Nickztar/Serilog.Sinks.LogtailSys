@@ -19,7 +19,7 @@ public partial class StringTests
     public void CanTrimString(string source, char trimChar, string expected)
     {
         var cleaned = new StringCleaner(source)
-            .WithTrimed(trimChar)
+            .WithTrimmed(trimChar)
             .WithUnescapeQuotes()
             .Build();
         cleaned.Should().Be(expected);

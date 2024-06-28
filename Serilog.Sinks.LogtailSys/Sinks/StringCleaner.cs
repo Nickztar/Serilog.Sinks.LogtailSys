@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Serilog.Sinks.Logtail
 {
@@ -10,7 +8,7 @@ namespace Serilog.Sinks.Logtail
     {
         private StringBuilder _builder = new(source);
 
-        public StringCleaner WithTrimed(char toTrim)
+        public StringCleaner WithTrimmed(char toTrim)
         {
             if (_builder.Length != 0 && _builder[0] == toTrim) 
                 _builder.Remove(0, 1);
@@ -32,14 +30,24 @@ namespace Serilog.Sinks.Logtail
         
         public StringCleaner WithEscapedChars(params char[] illegalChars)
         {
+#if NETSTANDARD2_0
+            var toEscape = new HashSet<char>(illegalChars);
+#else
+            var toEscape = illegalChars.ToHashSet();
+#endif
+            return WithEscapedChars(toEscape);
+        }
+    
+        public StringCleaner WithEscapedChars(HashSet<char> toEscape)
+        {
             var newBuilder = new StringBuilder(_builder.Length);
             for (var i = 0; i < _builder.Length; i++)
             {
                 var c = _builder[i];
-                if (!illegalChars.Contains(c))
+                if (!toEscape.Contains(c))
                 {
-                   newBuilder.Append(c);
-                   continue;
+                    newBuilder.Append(c);
+                    continue;
                 }
                 newBuilder.Append('\\');
                 newBuilder.Append(c);
@@ -67,14 +75,13 @@ namespace Serilog.Sinks.Logtail
         
         public StringCleaner WithAsciiPrintable()
         {
-            var newBuilder = new StringBuilder(_builder.Length);
             for (var i = 0; i < _builder.Length; i++)
             {
-                var c = _builder[i];
-                if (IsNonPrintableAscii(c)) continue;
-                newBuilder.Append(c);
+                if (_builder[i] is >= '\u0021' and <= '\u007E') continue;
+                _builder.Remove(i, 1);
+                i--;
             }
-            _builder = newBuilder;
+
             return this;
         }
         
@@ -82,12 +89,5 @@ namespace Serilog.Sinks.Logtail
         {
             return _builder.ToString();
         }
-        
-        /// <summary>
-        /// Due to this only existing in .NET. We have vendored this.
-        /// </summary>
-        /// <param name="c">Char</param>
-        /// <returns>True if is ascii</returns>
-        private static bool IsNonPrintableAscii(char c) => c is < '\u0021' or > '\u007E';
     }
 }

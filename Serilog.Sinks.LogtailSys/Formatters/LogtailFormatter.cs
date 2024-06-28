@@ -13,7 +13,7 @@ namespace Serilog.Sinks.Logtail
     /// Formats messages that comply with syslog RFC5424 & Logtail
     /// https://tools.ietf.org/html/rfc5424
     /// </summary>
-    public partial class LogtailFormatter : LogtailFormatterBase
+    public class LogtailFormatter : LogtailFormatterBase
     {
         /// <summary>
         /// Used in place of data that cannot be obtained or is unavailable
@@ -24,9 +24,10 @@ namespace Serilog.Sinks.Logtail
 
         private readonly string applicationName;
         private readonly string messageIdPropertyName;
-        private readonly string tokenKey;
-        private readonly string token;
-        private readonly string dataName;
+        private readonly string dataStart;
+        private readonly string tokenData;
+        private static readonly HashSet<char> KeyEscapeChars = ['=', '"', ']'];
+        private static readonly HashSet<char> ValueEscapeChars = ['"', '\\', ']'];
 
         internal const string DefaultMessageIdPropertyName = "SourceContext";
 
@@ -69,9 +70,8 @@ namespace Serilog.Sinks.Logtail
                 .WithMaxLength(32)
                 .Build();
 
-             this.tokenKey = tokenKey;
-             this.token = token;
-             this.dataName = dataName;
+             this.dataStart = $"[{dataName} ";
+             this.tokenData = $"[{tokenKey}=\"{token}\"]";
         }
 
         public override string FormatMessage(LogEvent logEvent)
@@ -99,7 +99,7 @@ namespace Serilog.Sinks.Logtail
                 return NILVALUE;
 
             var result = new StringCleaner(propertyValue.ToString())
-                .WithTrimed('"')
+                .WithTrimmed('"')
                 .WithUnescapeQuotes()
                 .WithAsciiPrintable()
                 .WithMaxLength(32)
@@ -114,18 +114,19 @@ namespace Serilog.Sinks.Logtail
         private string RenderStructuredData(LogEvent logEvent)
         {
              var builder = new StringBuilder();
-             builder.Append($"[{tokenKey}=\"{token}\"]");
+             builder.Append(tokenData);
              if (logEvent.Properties.Count is 0) 
                  return builder.ToString();
                  
-             builder.Append($"[{dataName} ");
+             builder.Append(dataStart);
              var propertyLen = logEvent.Properties.Count;
              foreach (var (i, property) in logEvent.Properties.Enumerate())
              {
-                 var kvp = $"""
-                 {RenderPropertyKey(property.Key)}="{RenderPropertyValue(property.Value)}"
-                 """;
-                 builder.Append(kvp);
+                 builder
+                     .Append(RenderPropertyKey(property.Key))
+                     .Append("=\"")
+                     .Append(RenderPropertyValue(property.Value))
+                     .Append('"');
                  if (i != propertyLen - 1)
                      builder.Append(' ');
              }
@@ -140,7 +141,7 @@ namespace Serilog.Sinks.Logtail
             // Unescaped regex pattern: [=\"\]]
             return new StringCleaner(propertyKey)
                 .WithAsciiPrintable()
-                .WithEscapedChars('=', '"', ']')
+                .WithEscapedChars(KeyEscapeChars)
                 .WithMaxLength(32)
                 .Build();
         }
@@ -154,11 +155,10 @@ namespace Serilog.Sinks.Logtail
         {
             // Trim surrounding quotes, and unescape all others
             // Use a backslash to escape backslashes, double quotes and closing square brackets
-            return new StringCleaner(propertyValue
-                .ToString())
-                .WithTrimed('"')
+            return new StringCleaner(propertyValue.ToString())
+                .WithTrimmed('"')
                 .WithUnescapeQuotes()
-                .WithEscapedChars('"', '\\', ']')
+                .WithEscapedChars(ValueEscapeChars)
                 .Build();
 
         }
