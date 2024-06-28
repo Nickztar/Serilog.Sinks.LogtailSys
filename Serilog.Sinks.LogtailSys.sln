@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serilog.Sinks.LogtailSys", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serilog.Sinks.LogtailSys.Example", "Serilog.Sinks.LogtailSys.Example\Serilog.Sinks.LogtailSys.Example.csproj", "{E01C60E8-9A08-4085-9F76-5068E98CA229}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serilog.Sinks.LogtailSys.Tests", "Serilog.Sinks.LogtailSys.Tests\Serilog.Sinks.LogtailSys.Tests.csproj", "{CD0E3355-D7EB-485E-AD0B-782380DC7532}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{E01C60E8-9A08-4085-9F76-5068E98CA229}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E01C60E8-9A08-4085-9F76-5068E98CA229}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E01C60E8-9A08-4085-9F76-5068E98CA229}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD0E3355-D7EB-485E-AD0B-782380DC7532}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD0E3355-D7EB-485E-AD0B-782380DC7532}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD0E3355-D7EB-485E-AD0B-782380DC7532}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD0E3355-D7EB-485E-AD0B-782380DC7532}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

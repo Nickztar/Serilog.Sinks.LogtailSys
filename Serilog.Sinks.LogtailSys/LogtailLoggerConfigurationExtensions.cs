@@ -134,7 +134,7 @@ namespace Serilog
         {
             var addr = Dns.GetHostAddresses(host)
                 .First(x => x.AddressFamily is AddressFamily.InterNetwork or AddressFamily.InterNetworkV6);
-
+            
             return new IPEndPoint(addr, port);
         }
     }
