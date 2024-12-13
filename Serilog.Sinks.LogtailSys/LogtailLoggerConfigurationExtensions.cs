@@ -3,10 +3,10 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using Serilog.Configuration;
+using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Display;
-using Serilog.Sinks.PeriodicBatching;
 using Serilog.Sinks.Logtail;
 
 namespace Serilog
@@ -16,11 +16,12 @@ namespace Serilog
     /// </summary>
     public static class LogtailLoggerConfigurationExtensions
     {
-        private static readonly PeriodicBatchingSinkOptions DefaultBatchOptions = new PeriodicBatchingSinkOptions
+        private static readonly BatchingOptions DefaultBatchOptions = new BatchingOptions
         {
             BatchSizeLimit = 1000,
-            Period = TimeSpan.FromSeconds(2),
-            QueueLimit = 100_000
+            BufferingTimeLimit = TimeSpan.FromSeconds(2),
+            QueueLimit = 100_000,
+            EagerlyEmitFirstEvent = true
         };
 
         /// <summary>
@@ -37,6 +38,7 @@ namespace Serilog
         /// <param name="batchConfig">Batching configuration</param>
         /// <param name="outputTemplate">A message template describing the output messages</param>
         /// <param name="restrictedToMinimumLevel">The minimum level for events passed through the sink</param>
+        /// <param name="levelSwitch">A switch allowing the pass-through minimum level to be changed at runtime.</param>
         /// <param name="messageIdPropertyName">Where the Id number of the message will be derived from. Defaults to the "SourceContext" property of the syslog event. Property name and value must be all printable ASCII characters with max length of 32.</param>
         /// <param name="sourceHost"><inheritdoc cref="LogtailFormatterBase.Host" path="/summary"/></param>
         /// <param name="severityMapping">Provide your own method to override the default mapping logic of a Serilog <see cref="LogEventLevel"/></param>
@@ -51,9 +53,10 @@ namespace Serilog
             string dataName = "Parameters", 
             string? appName = null,
             Facility facility = Facility.Local0, 
-            PeriodicBatchingSinkOptions? batchConfig = null, 
+            BatchingOptions? batchConfig = null, 
             string? outputTemplate = null,
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum,
+            LoggingLevelSwitch? levelSwitch = null,
             string messageIdPropertyName = LogtailFormatter.DefaultMessageIdPropertyName,
             string? sourceHost = null,
             Func<LogEventLevel, Severity>? severityMapping = null, 
@@ -67,9 +70,7 @@ namespace Serilog
             var endpoint = ResolveIP(host, port);
 
             var logtailSink = new LogtailSink(endpoint, messageFormatter);
-            var sink = new PeriodicBatchingSink(logtailSink, batchConfig);
-
-            return loggerSinkConfig.Sink(sink, restrictedToMinimumLevel);
+            return loggerSinkConfig.Sink(logtailSink, batchConfig, restrictedToMinimumLevel, levelSwitch);
         }
 
 

@@ -4,9 +4,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Serilog.Core;
 using Serilog.Debugging;
 using Serilog.Events;
-using Serilog.Sinks.PeriodicBatching;
 
 namespace Serilog.Sinks.Logtail
 {
@@ -30,7 +30,7 @@ namespace Serilog.Sinks.Logtail
         /// Emit a batch of log events, running asynchronously.
         /// </summary>
         /// <param name="events">The events to send to the syslog service</param>
-        public async Task EmitBatchAsync(IEnumerable<LogEvent> events)
+        public async Task EmitBatchAsync(IReadOnlyCollection<LogEvent> events)
         {
             foreach (var logEvent in events)
             {
